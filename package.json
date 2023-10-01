@@ -1,0 +1,18 @@
+{
+  "name": "mudey-replace-dir",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/mudey-replace-dir",
+  "bin": {
+    "mudey-replace-dir": "bin/mudey-replace-dir"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "espero-soft",
+    "mudey"
+  ],
+  "author": "Mudey Formation",
+  "license": "MIT"
+}

@@ -1,0 +1,77 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+
+const source = process.argv[2]
+if(!source){
+  console.error('Source directory not found !');
+  return;
+}
+const target = process.argv[3]
+if(!target){
+  console.error('Target directory not found !');
+  return;
+}
+const newDirToReplace = process.argv[4]
+
+if(!target){
+  console.error('New directory not found !');
+  return;
+}
+
+function copyFolderRecursiveSync(source, target) {
+  // Lister les fichiers et dossiers dans le dossier source
+  const files = fs.readdirSync(source);
+
+  // Assurez-vous que le dossier cible existe, sinon créez-le
+  if (!fs.existsSync(target)) {
+    fs.mkdirSync(target);
+  }
+
+  files.forEach((file) => {
+    const sourcePath = path.join(source, file);
+    const targetPath = path.join(target, file);
+
+    if (fs.statSync(sourcePath).isDirectory()) {
+      // Si c'est un dossier, récursivement copiez son contenu
+      copyFolderRecursiveSync(sourcePath, targetPath);
+    } else {
+      // Si c'est un fichier, copiez-le
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+  });
+}
+
+
+// Fonction pour parcourir récursivement les dossiers et remplacer le dossier "assets"
+function replaceAssetsDirectories(directory) {
+  const items = fs.readdirSync(directory);
+
+  items.forEach((item) => {
+    const itemPath = path.join(directory, item);
+
+    if (fs.statSync(itemPath).isDirectory()) {
+      // C'est un dossier, récursivement parcourir son contenu
+      replaceAssetsDirectories(itemPath);
+
+      // Vérifier si le dossier actuel est "assets"
+      if (item === target) {
+        // Supprimer le dossier "assets"
+        fs.rmSync(itemPath, { recursive: true });
+
+        // Créer un nouveau dossier "assets" au même emplacement
+        const newAssetsDirectory = path.join(directory, target);
+        fs.mkdirSync(newAssetsDirectory);
+        copyFolderRecursiveSync("./"+newDirToReplace, newAssetsDirectory);
+        console.log(newAssetsDirectory);
+      }
+    }
+  });
+}
+
+// Utilisation : spécifiez le chemin vers le répertoire racine
+const rootDirectory = './'+source;
+
+replaceAssetsDirectories(rootDirectory);
